@@ -1,0 +1,90 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Building out a notebook for my notes - seems legit.
+
+Ran across a paper 'Content-boosted Matrix Factorization Techniques for Recommender Systems'
+and realized 2 things:
+
+1) These methods could be pretty useful in my work
+
+2) I do not know enough matrix math
+
+To address point 2 - I am going to work through the math using R as my 
+terra firma and see if I can build a new package OR extend an existing one to 
+do a service to the open source community - plus L E A R N I N G!
+
+##SVD
+
+SVD - or singular value decomposition - allows you take a matrix and create two 
+new matricies that have compressed information (and thus size) via a user specified 
+parameter.  More formally - a matrix M gets converted to
+U S V where U is the number of rows in M x the user specified decomposition term
+and V is the number of columns x the user specified decomposition term.  S is 
+the rectangular diagonal matrix that allows you to get U and V back to M's dimensions.
+
+
+```{r}
+unroll_Vecs <- function (params, Y, R, num_users, num_movies, num_features) {
+  # Unrolls vector into X and Theta
+  # Also calculates difference between preduction and actual 
+  
+  endIdx <- num_movies * num_features
+  
+  X     <- matrix(params[1:endIdx], nrow = num_movies, ncol = num_features)
+  Theta <- matrix(params[(endIdx + 1): (endIdx + (num_users * num_features))], 
+                  nrow = num_users, ncol = num_features)
+  
+  Y_dash     <-   (((X %*% t(Theta)) - Y) * R) # Prediction error
+  
+  return(list(X = X, Theta = Theta, Y_dash = Y_dash))
+}
+
+J_cost <-  function(params, Y, R, num_users, num_movies, num_features, lambda, alpha) {
+  # Calculates the cost
+  
+  unrolled <- unroll_Vecs(params, Y, R, num_users, num_movies, num_features)
+  X <- unrolled$X
+  Theta <- unrolled$Theta
+  Y_dash <- unrolled$Y_dash
+  
+  J <-  .5 * sum(   Y_dash ^2)  + lambda/2 * sum(Theta^2) + lambda/2 * sum(X^2)
+  
+  return (J)
+}
+
+grr <- function(params, Y, R, num_users, num_movies, num_features, lambda, alpha) {
+  # Calculates the gradient step
+  # Here lambda is the regularization parameter
+  # Alpha is the step size
+
+  unrolled <- unroll_Vecs(params, Y, R, num_users, num_movies, num_features)
+  X <- unrolled$X
+  Theta <- unrolled$Theta
+  Y_dash <- unrolled$Y_dash
+  
+  X_grad     <- ((   Y_dash  %*% Theta) + lambda * X     )
+  Theta_grad <- (( t(Y_dash) %*% X)     + lambda * Theta )
+  
+  grad = c(X_grad, Theta_grad)
+  return(grad)
+}
+
+# Now that everything is set up, call optim
+print(
+  res <- optim(par = c(runif(num_users * num_features), runif(num_movies * num_features)), # Random starting parameters
+               fn = J_cost, gr = grr, 
+               Y=Y, R=R, 
+               num_users=num_users, num_movies=num_movies,num_features=num_features, 
+               lambda=lambda, alpha = alpha, 
+               method = "L-BFGS-B", control=list(maxit=maxit, trace=1))
+)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
