@@ -1,0 +1,111 @@
+---
+title: "Collaborative Filtering"
+author: "Bryan"
+date: "10/22/2019"
+output: html_document
+---
+
+
+
+Instead of using traits of the features (user/item features) to deterimine 
+similarity - focus on the similarty of the user ratings for two items.  
+
+```{r}
+data = matrix(data = c(4, NA, NA, 5, 1, NA, NA,
+                       5, 5, 4, NA, NA, NA, NA,
+                       NA, NA, NA, 2, 4, 5, NA,
+                       NA, 3, NA, NA, NA, NA, 3), 
+              ncol = 7, byrow = T)
+print(data)
+```
+
+In place of an item-profile vector for an item we use its column in the utility 
+matrix.
+
+
+# Jaccard Distance
+
+Ignores rating values, looks instead to see which items that
+two users have both reviewed and compares that intersection to the total number
+of items the users have reviewed.  This works great for occurance data, such
+as 'has viewed video' or 'has purchased item' but can lead to counterintuitive 
+results if your data is enriched with a scale for its utility matrix, such as 
+'count of purchases' or 'rating'.  This point is illustrated below - 
+```{r}
+jaccard_distance = function(x, y){
+  intersection = length(which(x & y))
+  union = length(which(x | y))
+  1 - (intersection/union)
+}
+#A + B
+jaccard_distance(data[1,], data[2,])
+#A + C
+jaccard_distance(data[1,], data[3,])
+```
+
+Although users A and C have VERY different opinions on products 4 and 5, they 
+will be marked as more similar to each other than A and B - even though A and B
+both seem to like product 1.
+
+### Rounding the data
+
+One solution to the problem illustrated above is to round the data so that high
+ratings (3+) count as a 1 and low ratings count as a zero - same as being unrated.
+This would change the utility martix to look like :
+```{r}
+round_matrix = function(mat, threshold){
+  (mat>threshold)*1
+}
+
+rounded_data = round_matrix(data, 3)
+print(rounded_data)
+
+```
+
+Now when we calculate the Jaccard distance, A and B are more similar than A and 
+C.
+```{r}
+#A + B
+jaccard_distance(rounded_data[1,], rounded_data[2,])
+#A + C
+jaccard_distance(rounded_data[1,], rounded_data[3,])
+```
+
+
+
+## Cosine Distance 
+
+Measures the cosine of the angle between two vectors projected in a multidimensional 
+space (groovy). Larger values indicate smaller angles between the vector,
+meaning more similar vectors.  One drawback of cosine similarity is that it must
+have missing values filled in - here I chose zeros - but this may not always be
+appropriate.  For example filling with 0 in a rating would be the same as saying 
+the user hated all movies they haven't seen.
+
+```{r}
+cosine_distance= function(x, y, missing_fill = 0){
+  x[is.na(x)] = missing_fill
+  y[is.na(y)] = missing_fill
+  c((x%*%y)/sqrt(sum(x^2)*sum(y^2)))
+}
+cosine_distance(x = data[1,], y = data[2,])
+```
+
+### Normalize Ratings
+
+```{r}
+normalize = function(x){
+  x - mean(x, na.rm = T)
+}
+
+normalize_matrix = function(mat){
+  t(apply(mat, 1, normalize))
+}
+
+normalized_data = normalize_matrix(data)
+
+cosine_distance(x = normalized_data[1,], y = normalized_data[2,])
+cosine_distance(x = normalized_data[1,], y = normalized_data[3,])
+```
+
+
