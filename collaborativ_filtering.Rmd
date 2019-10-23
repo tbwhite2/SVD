@@ -23,7 +23,7 @@ In place of an item-profile vector for an item we use its column in the utility
 matrix.
 
 
-# Jaccard Distance
+## Jaccard Distance
 
 Ignores rating values, looks instead to see which items that
 two users have both reviewed and compares that intersection to the total number
@@ -54,7 +54,7 @@ ratings (3+) count as a 1 and low ratings count as a zero - same as being unrate
 This would change the utility martix to look like :
 ```{r}
 round_matrix = function(mat, threshold){
-  (mat>threshold)*1
+  (mat > threshold)*1
 }
 
 rounded_data = round_matrix(data, 3)
@@ -83,10 +83,10 @@ appropriate.  For example filling with 0 in a rating would be the same as saying
 the user hated all movies they haven't seen.
 
 ```{r}
-cosine_distance= function(x, y, missing_fill = 0){
+cosine_distance = function(x, y, missing_fill = 0){
   x[is.na(x)] = missing_fill
   y[is.na(y)] = missing_fill
-  c((x%*%y)/sqrt(sum(x^2)*sum(y^2)))
+  c((x %*% y)/sqrt(sum(x^2)*sum(y^2)))
 }
 cosine_distance(x = data[1,], y = data[2,])
 ```
@@ -107,5 +107,28 @@ normalized_data = normalize_matrix(data)
 cosine_distance(x = normalized_data[1,], y = normalized_data[2,])
 cosine_distance(x = normalized_data[1,], y = normalized_data[3,])
 ```
+
+## Making Predictions
+
+You can view the utility matrix as telling us about user or items, or both - all
+of the previous examples were focused on finding similar users, but we could 
+flip the dimension (choose column instead of rows) and find similar items.
+
+One way of making predictions for a given user is to find some number of other
+similar users and average their ratings for each item.  In general it is best
+to normalize ratings as some users typically rate higher or lower than others.
+
+We can also flip this problem to use items by finding some number of other 
+similar items to a given item.  A user that likes the given item will probably
+like something similar.  Normalization of ratings is advised for the same reasons 
+as above.
+
+Item item similarity tends to provide more reliable information as it is usually
+easier to find items with similar traits than it is to find users that only like
+specific subsets of traits - but this guideline depends on what your utility 
+matrix is capturing and the behavior of your system.
+
+
+
 
 
