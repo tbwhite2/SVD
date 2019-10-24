@@ -136,7 +136,8 @@ matrix is capturing and the behavior of your system.
 
 
 Below I've implemented an item based movie recommender based on the movielens 
-small current dataset (full datasets here).  The details for how and why I 
+small current dataset (full datasets here : https://grouplens.org/datasets/movielens/).
+The details for how and why I 
 manipulated the movielens data the way I did are for another post, but it 
 should allow for some fun exploration.  
 
