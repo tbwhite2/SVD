@@ -1,7 +1,7 @@
 PackratFormat: 1.4
 PackratVersion: 0.5.0
 RVersion: 3.4.4
-Repos: CRAN=https://cran.microsoft.com,
+Repos: CRAN=https://cran.rstudio.com,
     EastmanCRAN=http://lnxaws01.emn.com/EastmanCRAN
 
 Package: Rcpp
@@ -9,10 +9,20 @@ Source: CRAN
 Version: 1.0.1
 Hash: 390ed5b5da840cec3e6f5c90c6ab23f7
 
+Package: backports
+Source: CRAN
+Version: 1.1.5
+Hash: 35ad64fcf2063e2a52031b0f1a59d8f0
+
 Package: base64enc
 Source: CRAN
 Version: 0.1-3
 Hash: c590d29e555926af053055e23ee79efb
+
+Package: data.table
+Source: CRAN
+Version: 1.12.6
+Hash: 4fbfebe60de9b5c065ba21f37c68e544
 
 Package: digest
 Source: CRAN
@@ -78,6 +88,12 @@ Version: 1.14
 Hash: 3ef48feba7356d078d9d2eb36e2c4bdd
 Requires: base64enc, evaluate, htmltools, jsonlite, knitr, mime,
     stringr, tinytex, xfun, yaml
+
+Package: rprojroot
+Source: CRAN
+Version: 1.3-2
+Hash: a25c3f70c166fb3fbabc410eb32b6366
+Requires: backports
 
 Package: stringi
 Source: CRAN
