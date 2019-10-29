@@ -1,0 +1,18 @@
+what I based the content off of
+http://infolab.stanford.edu/~ullman/mmds/ch9.pdf
+
+
+good svd overview 
+http://www.di.fc.ul.pt/~jpn/r/svd/svd.html
+
+
+neat stuff + overview
+http://www.mit.edu/~rakhlin/6.883/lectures/lecture07.pdf
+
+netflix recommender
+https://sifter.org/~simon/journal/20061211.html
+
+another overview 
+https://datasciencemadesimpler.wordpress.com/tag/singular-value-decomposition/
+  
+https://towardsdatascience.com/prototyping-a-recommender-system-step-by-step-part-2-alternating-least-square-als-matrix-4a76c58714a1
